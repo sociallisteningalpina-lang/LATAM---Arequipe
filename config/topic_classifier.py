@@ -8,18 +8,18 @@ Personalizable por campaña/producto
 import re
 from typing import Callable
 
-
 def create_topic_classifier() -> Callable[[str], str]:
     """
-    Retorna una función de clasificación de temas personalizada para esta campaña.
+    Retorna una función de clasificación de temas personalizada para campaña Arequipe x LATAM.
+    Campaña de activación con Arequipitos Alpina en vuelos de LATAM.
     
     Returns:
         function: Función que toma un comentario (str) y retorna un tema (str)
     
     Usage:
         classifier = create_topic_classifier()
-        tema = classifier("¿Dónde puedo comprar este producto?")
-        # tema = 'Preguntas sobre el Producto'
+        tema = classifier("El arequipe estaba delicioso en mi vuelo")
+        # tema = 'Opinión Positiva - Arequipe/Alpina'
     """
     
     def classify_topic(comment: str) -> str:
@@ -34,51 +34,79 @@ def create_topic_classifier() -> Callable[[str], str]:
         """
         comment_lower = str(comment).lower()
         
-        # CATEGORÍA 1: Preguntas sobre el Producto
+        # CATEGORÍA 1: Opinión Positiva - Arequipe/Alpina
         if re.search(
-            r'\bprecio\b|\bcu[aá]nto vale\b|d[oó]nde|c[oó]mo consigo|'
-            r'duda|pregunta|comprar|tiendas|disponible|sirve para|'
-            r'c[oó]mo se toma|tiene az[uú]car|valor',
+            r'arequipe.*\brico\b|arequipe.*\bdelicioso\b|arequipe.*\bbueno\b|'
+            r'arequipe.*\bencanta\b|arequipe.*\bsabroso\b|arequipe.*\bdedo\b|'
+            r'alpina.*\brico\b|alpina.*\bbueno\b|me.*encanta.*arequipe',
             comment_lower
         ):
-            return 'Preguntas sobre el Producto'
+            return 'Opinión Positiva - Arequipe/Alpina'
         
-        # CATEGORÍA 2: Comparación con Kéfir Casero/Artesanal
+        # CATEGORÍA 2: Opinión Negativa - Arequipe/Alpina
         if re.search(
-            r'b[úu]lgaros|n[oó]dulos|en casa|casero|artesanal|'
-            r'preparo yo|vendo el cultivo|hecho por mi',
+            r'arequipe.*\bmalo\b|arequipe.*\bazúcar\b|arequipe.*\benfermar\b|'
+            r'azúcar.*\barequipe\b|dulce.*exceso|demasiado.*dulce',
             comment_lower
         ):
-            return 'Comparación con Kéfir Casero/Artesanal'
+            return 'Opinión Negativa - Arequipe/Alpina'
         
-        # CATEGORÍA 3: Ingredientes y Salud
+        # CATEGORÍA 3: Opinión Positiva - LATAM
         if re.search(
-            r'aditivos|almid[oó]n|preservantes|lactosa|microbiota|'
-            r'flora intestinal|saludable|bacterias|vivas|gastritis|'
-            r'colon|helicobacter|az[uú]car añadid[oa]s',
+            r'latam.*\bmejor\b|latam.*\bbuena\b|latam.*\bexcelente\b|'
+            r'latam.*\bencanta\b|latam.*\bnúmero\s*1\b|latam.*\bpreferida\b|'
+            r'me\s*l\s*amo.*latam|latam.*detallistas|latam.*atención|'
+            r'latam.*seguridad|nunca.*sentido.*bien.*aerolínea',
             comment_lower
         ):
-            return 'Ingredientes y Salud'
+            return 'Opinión Positiva - LATAM'
         
-        # CATEGORÍA 4: Competencia y Disponibilidad
+        # CATEGORÍA 4: Opinión Negativa - LATAM
         if re.search(
-            r'pasco|\b[eé]xito\b|\bara\b|ol[ií]mpica|d1|'
-            r'copia de|no lo venden|no llega|no lo encuentro|no hay en',
+            r'latam.*\bmierda\b|latam.*\bporquería\b|latam.*\bmala\b|'
+            r'latam.*\bpésim[oa]\b|latam.*\broban\b|latam.*\bmaleta\b|'
+            r'latam.*\bmalo\b|latam.*control',
             comment_lower
         ):
-            return 'Competencia y Disponibilidad'
+            return 'Opinión Negativa - LATAM'
         
-        # CATEGORÍA 5: Opinión General del Producto
+        # CATEGORÍA 5: Experiencia de Vuelo - Detalles Positivos
         if re.search(
-            r'rico|bueno|excelente|gusta|mejor|delicioso|espectacular|'
-            r'encanta|s[úu]per|feo|horrible|mal[ií]simo|sabe a',
+            r'\bdetalle[s]?\b.*\bbonito[s]?\b|\brefrigerio\b|\bcafé\b|'
+            r'juan\s*valdez|\batención\b.*\bbuena\b|viajamos.*dieron|'
+            r'tripulantes|cabina|clase.*bisnes|business',
             comment_lower
         ):
-            return 'Opinión General del Producto'
+            return 'Experiencia de Vuelo - Detalles Positivos'
         
-        # CATEGORÍA 6: Fuera de Tema / No Relevante
+        # CATEGORÍA 6: Comparación con Otras Aerolíneas
         if re.search(
-            r'am[eé]n|jajaja|receta|gracias|bendiciones',
+            r'\bavianca\b|\biberia\b|otra.*aerolínea|'
+            r'mejor.*que.*avianca|decadencia|comparación',
+            comment_lower
+        ):
+            return 'Comparación con Otras Aerolíneas'
+        
+        # CATEGORÍA 7: Quejas sobre Servicio Aéreo
+        if re.search(
+            r'roben.*maleta|robar.*equipaje|ni.*tinto.*ofrecen|'
+            r'no.*ofrecen|mal.*servicio|equipaje',
+            comment_lower
+        ):
+            return 'Quejas sobre Servicio Aéreo'
+        
+        # CATEGORÍA 8: Reacciones al Contenido del Video
+        if re.search(
+            r'el\s*man|video|aparece|charlie\s*kirk|bobo|'
+            r'deja.*familia.*perro|jajaja.*arequipe|en\s*serio',
+            comment_lower
+        ):
+            return 'Reacciones al Contenido del Video'
+        
+        # CATEGORÍA 9: Fuera de Tema / No Relevante
+        if re.search(
+            r'^jaja+$|^ja+ja+ja+$|^0q|^10\s*q+|^\d+\s*[qa]+\s*\d+|'
+            r'^[qoa\s\d]+$|^que\s*bien$|^saludos$',
             comment_lower
         ) or len(comment_lower.split()) < 3:
             return 'Fuera de Tema / No Relevante'
@@ -87,7 +115,6 @@ def create_topic_classifier() -> Callable[[str], str]:
         return 'Otros'
     
     return classify_topic
-
 
 # ============================================================================
 # METADATA DE LA CAMPAÑA (OPCIONAL)
